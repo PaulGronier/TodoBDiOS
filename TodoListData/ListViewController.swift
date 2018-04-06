@@ -13,32 +13,14 @@ class ListViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var searchBar: UISearchBar!
     
-    let items = ["BIERE", "Pizza", "Vinyle", "Poulet"]
-    
-    var items2 = [Item]()
-    
-  
-    var filteredItems = [Item]()
-
-    
+    let dataManager = DataManager.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        createItems()
         tableView.register(ListTableViewCell.self, forCellReuseIdentifier: "ListViewCellIdentifier")
-        
      
     }
     
-    func createItems() {
-        for item in items {
-            let newElement = Item(name: item)
-            
-            items2.append(newElement)
-        }
-        filteredItems = items2
-    }
-
     //Actions
     
     @IBAction func Edit(_ sender: Any) {
@@ -46,21 +28,6 @@ class ListViewController: UIViewController {
         
         tableView.isEditing = !tableView.isEditing
         
-    }
-    
-    func saveData(_ item: [Item]) {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = .prettyPrinted
-        
-        let data = try? encoder.encode(item)
-        try? data?.write(to: getDocumentsDirectory())
-    }
-    
-    func getDocumentsDirectory() -> URL {
-        var documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        documentsDirectory.appendPathComponent("items.json", isDirectory: false)
-        print(documentsDirectory)
-        return documentsDirectory
     }
     
     
@@ -71,9 +38,11 @@ class ListViewController: UIViewController {
         let okAction = UIAlertAction(title: "Ok", style: .default) { (action) in
             let textField = alertController.textFields![0]
             
-            let item = Item(name: textField.text!)
-            self.items2.append(item)
-            self.saveData(self.items2)
+            let item = Item(context: DataManager.shared.persistentContainer.viewContext)
+            item.name = textField.text!
+            item.checked = false
+            self.dataManager.cachedItems.append(item)
+            self.dataManager.saveData(self.dataManager.cachedItems)
             self.filterContentForSearchText(self.searchBar.text!)
         }
         alertController.addTextField { (textField) in
@@ -95,12 +64,12 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "ListViewCellIdentifier", for: indexPath)
         
-        var item = items2[indexPath.row % items2.count]
+        var item = self.dataManager.cachedItems[indexPath.row % self.dataManager.cachedItems.count]
         
         if isFiltering() {
-            item = filteredItems[indexPath.row]
+            item = self.dataManager.filteredItems[indexPath.row]
         } else {
-            item = items2[indexPath.row]
+            item = self.dataManager.cachedItems[indexPath.row]
         }
         
         cell.textLabel?.text = item.name
@@ -111,9 +80,9 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if isFiltering() {
-            return filteredItems.count
+            return self.dataManager.filteredItems.count
         }
-        return items2.count
+        return self.dataManager.cachedItems.count
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -123,7 +92,7 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
         
         cell?.accessoryType = (cell?.accessoryType == .checkmark) ? .none : .checkmark
         
-        let item = items2[indexPath.row % items2.count]
+        let item = self.dataManager.cachedItems[indexPath.row % self.dataManager.cachedItems.count]
         item.checked = !item.checked
         
         tableView.reloadRows(at: [indexPath], with: .automatic)
@@ -133,21 +102,20 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
      func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             if isFiltering() {
-                let index = items2.index(where: { $0 === filteredItems[indexPath.row] } )
-                filteredItems.remove(at: indexPath.row)
-                items2.remove(at: index!)
+                let index = self.dataManager.cachedItems.index(where: { $0 === self.dataManager.filteredItems[indexPath.row] } )
+                self.dataManager.filteredItems.remove(at: index!)
+                self.dataManager.removeItem(at: index!)
             } else {
-                items2.remove(at: indexPath.row)
+                self.dataManager.removeItem(at: indexPath.row)
             }
             tableView.deleteRows(at: [indexPath], with: .automatic)
-            
         }
     }
     
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        let sourceItem = items2.remove(at: sourceIndexPath.row)
-        
-        items2.insert(sourceItem, at: destinationIndexPath.row)
+        let sourceItem = self.dataManager.cachedItems[sourceIndexPath.row % self.dataManager.cachedItems.count]
+         self.dataManager.removeItem(at: sourceIndexPath.row)
+        self.dataManager.insertItem(item: sourceItem, at: destinationIndexPath.row)
     }
     
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
@@ -168,8 +136,8 @@ extension ListViewController: UISearchBarDelegate  {
     }
     
     func filterContentForSearchText(_ searchText: String, scope: String = "All") {
-        filteredItems = self.items2.filter({( item : Item) -> Bool in
-            return item.name.lowercased().contains(searchText.lowercased())
+        self.dataManager.filteredItems = self.dataManager.cachedItems.filter({( item : Item) -> Bool in
+            return item.name!.lowercased().contains(searchText.lowercased())
         })
         
         tableView.reloadData()

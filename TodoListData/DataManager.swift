@@ -13,7 +13,7 @@ class DataManager {
     
     static let shared = DataManager()
     
-    //let items = ["BIERE", "Pizza", "Vinyle", "Poulet"]
+    //let items = ["Bière", "Pizza", "Vinyle", "Poulet"]
     
     //var items2 = [Item]()
     

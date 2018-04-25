@@ -13,21 +13,19 @@ class ListViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var searchBar: UISearchBar!
     
+    var categoryPassed = String()
     let dataManager = DataManager.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.register(ListTableViewCell.self, forCellReuseIdentifier: "ListViewCellIdentifier")
-     
     }
     
     //Actions
     
     @IBAction func Edit(_ sender: Any) {
         let editButton = sender as! UIBarButtonItem
-        
-        tableView.isEditing = !tableView.isEditing
-        
+        tableView.isEditing = !tableView.isEditing        
     }
     
     
@@ -37,22 +35,28 @@ class ListViewController: UIViewController {
         
         let okAction = UIAlertAction(title: "Ok", style: .default) { (action) in
             let textField = alertController.textFields![0]
-            
-            let item = Item(context: DataManager.shared.persistentContainer.viewContext)
-            item.name = textField.text!
-            item.checked = false
-            self.dataManager.cachedItems.append(item)
-            self.dataManager.saveData(self.dataManager.cachedItems)
-            self.filterContentForSearchText(self.searchBar.text!)
+            if textField.text != "" {
+                let item = Item(context: DataManager.shared.persistentContainer.viewContext)
+                item.name = textField.text!
+                item.checked = false
+                self.dataManager.cachedItems.append(item)
+                self.dataManager.saveData(self.dataManager.cachedItems)
+                
+                let destinationViewController = self.storyboard?.instantiateViewController(withIdentifier: "SecondViewController")
+                
+                self.navigationController?.pushViewController(destinationViewController!, animated: true)
+                
+            }
         }
+        
         alertController.addTextField { (textField) in
             textField.placeholder = "Title"
         }
         
         alertController.addAction(okAction)
         
-        self.present(alertController, animated: true, completion: nil)
-        
+        present(alertController, animated: true, completion: nil)
+        print(categoryPassed)
     }
     
 }

@@ -14,6 +14,7 @@ class ListViewController: UIViewController {
     @IBOutlet weak var searchBar: UISearchBar!
     
     let dataManager = DataManager.shared
+//    var filteredItems = [Item]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,7 +28,7 @@ class ListViewController: UIViewController {
         let editButton = sender as! UIBarButtonItem
         
         tableView.isEditing = !tableView.isEditing
-        
+        self.dataManager.triage()
     }
     
     
@@ -41,11 +42,11 @@ class ListViewController: UIViewController {
             let item = Item(context: DataManager.shared.persistentContainer.viewContext)
             item.name = textField.text!
             item.checked = false
-            self.dataManager.cachedItems.append(item)
             self.dataManager.saveData()
-            //self.filterContentForSearchText(self.searchBar.text!)
-            self.dataManager.fetchedRequest.predicate = NSPredicate(format: "name contains[cd] %@", self.searchBar.text!)
+            self.dataManager.fetchedRequest.predicate = nil
+            self.dataManager.loadData()
             self.tableView.reloadData()
+
 
         }
         alertController.addTextField { (textField) in
@@ -58,6 +59,11 @@ class ListViewController: UIViewController {
         
     }
     
+    @IBAction func organizeButton(_ sender: Any) {
+        dataManager.triage()
+        dataManager.loadData()
+        tableView.reloadData()
+    }
 }
 
 
@@ -67,14 +73,7 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "ListViewCellIdentifier", for: indexPath)
         
-        var item = self.dataManager.cachedItems[indexPath.row % self.dataManager.cachedItems.count]
-
-//        if isFiltering() {
-//            item = self.dataManager.filteredItems[indexPath.row]
-//        } else {
-            item = self.dataManager.cachedItems[indexPath.row]
-//        }
-        
+        let item = self.dataManager.cachedItems[indexPath.row]
       
         cell.textLabel?.text = item.name
         cell.accessoryType = item.checked == true ? .checkmark : .none
@@ -83,9 +82,7 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//        if isFiltering() {
-//            return self.dataManager.filteredItems.count
-//        }
+
         return self.dataManager.cachedItems.count
     }
     
@@ -96,7 +93,7 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
         
         cell?.accessoryType = (cell?.accessoryType == .checkmark) ? .none : .checkmark
         
-        let item = self.dataManager.cachedItems[indexPath.row % self.dataManager.cachedItems.count]
+        let item = self.dataManager.cachedItems[indexPath.row]
         item.checked = !item.checked
         
         tableView.reloadRows(at: [indexPath], with: .automatic)
@@ -105,13 +102,9 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
     
      func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            if isFiltering() {
-                //let index = self.dataManager.cachedItems.index(where: { $0 === self.dataManager.filteredItems[indexPath.row] } )
-                //self.dataManager.filteredItems.remove(at: index!)
-               // self.dataManager.removeItem(at: index!)
-            } else {
-                self.dataManager.removeItem(at: indexPath.row)
-            }
+
+            let item = self.dataManager.cachedItems[indexPath.row]
+            self.dataManager.removeItem(item)
             tableView.deleteRows(at: [indexPath], with: .automatic)
         }
     }
@@ -145,20 +138,12 @@ extension ListViewController: UISearchBarDelegate  {
         return searchBar.text?.isEmpty ?? true
     }
     
-//    func filterContentForSearchText(_ searchText: String, scope: String = "All") {
-//        self.dataManager.filteredItems = self.dataManager.cachedItems.filter({( item : Item) -> Bool in
-//            return item.name!.lowercased().contains(searchText.lowercased())
-//        })
-//
-//        tableView.reloadData()
-//    }
-    
     func isFiltering() -> Bool {
         return !searchBarIsEmpty()
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        //test nil
+      
         if !searchBarIsEmpty() {
             dataManager.fetchedRequest.predicate = NSPredicate(format: "name contains[cd] %@", searchText)
         } else {

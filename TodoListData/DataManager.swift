@@ -18,12 +18,12 @@ class DataManager {
     //var items2 = [Item]()
     
     var cachedItems = [Item]()
-    
+    var filteredItems = [Item]()
     var context: NSManagedObjectContext {
         return persistentContainer.viewContext
     }
     
-    var filteredItems = [Item]()
+    
     
     private init () {
         loadData()

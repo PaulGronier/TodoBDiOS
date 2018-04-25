@@ -65,13 +65,14 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ListViewCellIdentifier", for: indexPath)
         
         var item = self.dataManager.cachedItems[indexPath.row % self.dataManager.cachedItems.count]
-        
+
         if isFiltering() {
             item = self.dataManager.filteredItems[indexPath.row]
         } else {
             item = self.dataManager.cachedItems[indexPath.row]
         }
         
+      
         cell.textLabel?.text = item.name
         cell.accessoryType = item.checked == true ? .checkmark : .none
         

@@ -18,7 +18,8 @@ class DataManager {
     //var items2 = [Item]()
     
     var cachedItems = [Item]()
-    var filteredItems = [Item]()
+    let fetchedRequest = NSFetchRequest<Item>(entityName: "Item")
+    
     var context: NSManagedObjectContext {
         return persistentContainer.viewContext
     }
@@ -37,13 +38,12 @@ class DataManager {
             newElement.name = item.name
             cachedItems.append(newElement)
         }
-        filteredItems = cachedItems
     }
     
     func loadData() {
-        let fetchRequest: NSFetchRequest<Item> = Item.fetchRequest()
+//        let fetchRequest: NSFetchRequest<Item> = Item.fetchRequest()
         do {
-            cachedItems = try context.fetch(fetchRequest)
+            cachedItems = try context.fetch(fetchedRequest)
         } catch {
             debugPrint("Could not load items from CoreData")
         }
@@ -52,18 +52,18 @@ class DataManager {
     func removeItem(at index: Int) {
         let item = cachedItems.remove(at: index)
         persistentContainer.viewContext.delete(item)
-        saveData(cachedItems)
+        saveData()
         
     }
     
     func insertItem(item: Item, at index: Int) {
         cachedItems.insert(item, at: index)
         persistentContainer.viewContext.insert(item)
-        saveData(cachedItems)
+        saveData()
     }
     
     
-    func saveData(_ item: [Item]) {
+    func saveData() {
         saveContext()
     }
     

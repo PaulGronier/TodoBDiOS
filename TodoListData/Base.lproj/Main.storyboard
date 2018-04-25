@@ -63,6 +63,7 @@
                     <connections>
                         <outlet property="searchBar" destination="CSG-tw-xq2" id="bah-pD-h97"/>
                         <outlet property="tableView" destination="Xl6-hl-RLt" id="hKr-dL-wJ9"/>
+                        <segue destination="FAo-Su-V6t" kind="show" identifier="segueCategorie" id="423-cc-1Ws"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

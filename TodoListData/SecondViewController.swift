@@ -9,6 +9,9 @@
 import UIKit
 
 class SecondViewController: UIViewController {
+    
+    var itemToSend = Item(context: DataManager.shared.persistentContainer.viewContext)
+    var category = Category()
 
     override func viewDidLoad() {
         //Modal background
@@ -36,6 +39,7 @@ class SecondViewController: UIViewController {
     }
 
     func returnToListViewController(selected : String) {
+        itemToSend.category?.name = selected
         let myVC = storyboard?.instantiateViewController(withIdentifier: "ListViewController") as! ListViewController
         myVC.categoryPassed = selected
         navigationController?.pushViewController(myVC, animated: true)

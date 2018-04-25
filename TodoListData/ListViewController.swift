@@ -25,7 +25,7 @@ class ListViewController: UIViewController {
     
     @IBAction func Edit(_ sender: Any) {
         let editButton = sender as! UIBarButtonItem
-        tableView.isEditing = !tableView.isEditing        
+        tableView.isEditing = !tableView.isEditing
     }
     
     
@@ -39,12 +39,14 @@ class ListViewController: UIViewController {
                 let item = Item(context: DataManager.shared.persistentContainer.viewContext)
                 item.name = textField.text!
                 item.checked = false
-                self.dataManager.cachedItems.append(item)
-                self.dataManager.saveData(self.dataManager.cachedItems)
+
                 
                 let destinationViewController = self.storyboard?.instantiateViewController(withIdentifier: "SecondViewController")
                 
                 self.navigationController?.pushViewController(destinationViewController!, animated: true)
+                
+                self.dataManager.cachedItems.append(item)
+                self.dataManager.saveData(self.dataManager.cachedItems)
                 
             }
         }
@@ -59,7 +61,19 @@ class ListViewController: UIViewController {
         print(categoryPassed)
     }
     
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "segueCategorie" {
+            let nextScene =  segue.destination as! SecondViewController
+            
+            // Pass the selected object to the new view controller.
+            nextScene.itemToSend = sender as! Item
+        }
+    }
+    
 }
+
+
 
 
 extension ListViewController: UITableViewDataSource, UITableViewDelegate {
@@ -160,6 +174,7 @@ extension ListViewController: UISearchBarDelegate  {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         filterContentForSearchText(searchText)
     }
+    
 }
 
 

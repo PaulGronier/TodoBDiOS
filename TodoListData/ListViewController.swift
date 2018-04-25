@@ -65,13 +65,14 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ListViewCellIdentifier", for: indexPath)
         
         var item = self.dataManager.cachedItems[indexPath.row % self.dataManager.cachedItems.count]
-        
+
         if isFiltering() {
             item = self.dataManager.filteredItems[indexPath.row]
         } else {
             item = self.dataManager.cachedItems[indexPath.row]
         }
         
+      
         cell.textLabel?.text = item.name
         cell.accessoryType = item.checked == true ? .checkmark : .none
         
@@ -121,6 +122,11 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
         return searchBar.text == ""
     }
+    
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return DataManager.shared.cachedItems.count > 1
+    }
+    
 }
 
 extension ListViewController: UISearchBarDelegate  {

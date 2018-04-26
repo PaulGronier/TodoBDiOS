@@ -91,7 +91,7 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
         
         let cell = tableView.cellForRow(at: indexPath)
         
-        cell?.accessoryType = (cell?.accessoryType == .checkmark) ? .none : .checkmark
+        cell!.accessoryType = (cell!.accessoryType == .checkmark) ? .none : .checkmark
         
         let item = self.dataManager.cachedItems[indexPath.row]
         item.checked = !item.checked
@@ -110,8 +110,9 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        let sourceItem = self.dataManager.cachedItems[sourceIndexPath.row % self.dataManager.cachedItems.count]
-        self.dataManager.removeItem(at: sourceIndexPath.row)
+        //let sourceItem = self.dataManager.cachedItems[sourceIndexPath.row % self.dataManager.cachedItems.count]
+        let sourceItem = self.dataManager.cachedItems.remove(at: sourceIndexPath.row)
+        //self.dataManager.removeItem(sourceItem)
         self.dataManager.insertItem(item: sourceItem, at: destinationIndexPath.row)
         self.dataManager.saveData()
     }

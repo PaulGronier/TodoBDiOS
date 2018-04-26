@@ -8,19 +8,21 @@
 
 import UIKit
 
+protocol SecondViewControllerDelegate: class {
+    func secondViewController(_ viewController: SecondViewController, didFinishChooseCategoryFor item: Item)
+}
+
 class SecondViewController: UIViewController {
+
+    //var itemToSend = Item(context: DataManager.shared.persistentContainer.viewContext)
+    var itemToSend = Item()
     
-    var itemToSend = Item(context: DataManager.shared.persistentContainer.viewContext)
-    var category = Category()
+    weak var delegate: SecondViewControllerDelegate?
+    //var category = Category()
 
     override func viewDidLoad() {
         //Modal background
-        view.backgroundColor = UIColor.clear
-        view.isOpaque = false
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
+        view.backgroundColor = UIColor.white
     }
 
     @IBAction func cat1(_ sender: Any) {
@@ -39,10 +41,17 @@ class SecondViewController: UIViewController {
     }
 
     func returnToListViewController(selected : String) {
-        itemToSend.category?.name = selected
-        let myVC = storyboard?.instantiateViewController(withIdentifier: "ListViewController") as! ListViewController
-        myVC.categoryPassed = selected
-        navigationController?.pushViewController(myVC, animated: true)
+//        dismiss(animated: true) {
+//            print("dismissed")
+//        }
+        itemToSend.category = selected
+        
+        delegate?.secondViewController(self, didFinishChooseCategoryFor: itemToSend)
+        
+        self.navigationController?.popViewController(animated: true)
+//        let myVC = storyboard?.instantiateViewController(withIdentifier: "ListViewController") as! ListViewController
+//        myVC.categoryPassed = selected
+//        navigationController?.pushViewController(myVC, animated: true)
     }
 
 }

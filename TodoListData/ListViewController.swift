@@ -41,12 +41,14 @@ class ListViewController: UIViewController {
                 item.checked = false
 
                 
-                let destinationViewController = self.storyboard?.instantiateViewController(withIdentifier: "SecondViewController")
+                let destinationViewController = self.storyboard?.instantiateViewController(withIdentifier: "SecondViewController") as! SecondViewController
                 
-                self.navigationController?.pushViewController(destinationViewController!, animated: true)
+                destinationViewController.delegate = self
+                destinationViewController.itemToSend = item
+                //destinationViewController?.prepare(for: UIStoryboardSegue, sender: item)
                 
-                self.dataManager.cachedItems.append(item)
-                self.dataManager.saveData(self.dataManager.cachedItems)
+                self.navigationController?.pushViewController(destinationViewController, animated: true)
+                
                 
             }
         }
@@ -62,7 +64,8 @@ class ListViewController: UIViewController {
     }
     
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    /*
+    override func prepare(for segue: UIStoryboardSegue!, sender: Any?) {
         if segue.identifier == "segueCategorie" {
             let nextScene =  segue.destination as! SecondViewController
             
@@ -70,6 +73,7 @@ class ListViewController: UIViewController {
             nextScene.itemToSend = sender as! Item
         }
     }
+ */
     
 }
 
@@ -94,6 +98,17 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
         cell.textLabel?.text = item.name
         cell.accessoryType = item.checked == true ? .checkmark : .none
         
+        // cell.contentView.backgroundColor = UIColor(hexString: cellColors[indexPath.row % cellColors.count])
+        
+        if(item.category == "first"){
+            cell.textLabel?.textColor = .red
+        }else if(item.category == "second"){
+            cell.textLabel?.textColor = .orange
+        }else if(item.category == "third"){
+           // cell.contentView.backgroundColor = .orange
+            cell.textLabel?.textColor = .purple
+        }
+        
         return cell
     }
     
@@ -115,7 +130,7 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
         item.checked = !item.checked
         
         tableView.reloadRows(at: [indexPath], with: .automatic)
-        
+        //print(item.category!)
     }
     
      func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
@@ -173,6 +188,17 @@ extension ListViewController: UISearchBarDelegate  {
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         filterContentForSearchText(searchText)
+    }
+    
+}
+
+extension ListViewController: SecondViewControllerDelegate {
+    
+    func secondViewController(_ viewController: SecondViewController, didFinishChooseCategoryFor item: Item) {
+        self.dataManager.cachedItems.append(item)
+        self.dataManager.saveData()
+        tableView.reloadData()
+
     }
     
 }

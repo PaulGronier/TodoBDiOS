@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Bn1-ae-V4D">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Bn1-ae-V4D">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -49,11 +49,6 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <navigationItem key="navigationItem" id="76G-sf-lGs">
-                        <barButtonItem key="leftBarButtonItem" systemItem="edit" id="Dkb-w4-k6d">
-                            <connections>
-                                <action selector="Edit:" destination="BYZ-38-t0r" id="UqF-Na-EQb"/>
-                            </connections>
-                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="aBK-oW-lTa">
                             <connections>
                                 <action selector="addButton:" destination="BYZ-38-t0r" id="gHf-A7-PUM"/>
@@ -79,25 +74,25 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Edm-ub-zYk">
-                                <rect key="frame" x="43" y="318" width="78" height="30"/>
+                                <rect key="frame" x="63" y="318" width="39" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Catégorie 1"/>
+                                <state key="normal" title="Fruits"/>
                                 <connections>
                                     <action selector="cat1:" destination="FAo-Su-V6t" eventType="touchUpInside" id="2gX-gF-9hO"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sUb-u7-mdh">
-                                <rect key="frame" x="147" y="318" width="80" height="30"/>
+                                <rect key="frame" x="156" y="318" width="63" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Catégorie 2"/>
+                                <state key="normal" title="Légumes"/>
                                 <connections>
                                     <action selector="cat2:" destination="FAo-Su-V6t" eventType="touchUpInside" id="GFN-Tm-Y5y"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8od-QT-ZcO">
-                                <rect key="frame" x="257" y="318" width="80" height="30"/>
+                                <rect key="frame" x="264" y="318" width="67" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Catégorie 3"/>
+                                <state key="normal" title="Féculents"/>
                                 <connections>
                                     <action selector="cat3:" destination="FAo-Su-V6t" eventType="touchUpInside" id="b0f-iO-Z8Z"/>
                                 </connections>

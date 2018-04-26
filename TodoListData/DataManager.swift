@@ -52,18 +52,18 @@ class DataManager {
     func removeItem(at index: Int) {
         let item = cachedItems.remove(at: index)
         persistentContainer.viewContext.delete(item)
-        saveData(cachedItems)
+        saveData()
         
     }
     
     func insertItem(item: Item, at index: Int) {
         cachedItems.insert(item, at: index)
         persistentContainer.viewContext.insert(item)
-        saveData(cachedItems)
+        saveData()
     }
     
     
-    func saveData(_ item: [Item]) {
+    func saveData() {
         saveContext()
     }
     

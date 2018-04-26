@@ -5,6 +5,7 @@
     </device>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <capability name="Navigation items with more than one left or right bar item" minToolsVersion="7.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -49,11 +50,18 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <navigationItem key="navigationItem" id="76G-sf-lGs">
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="aBK-oW-lTa">
-                            <connections>
-                                <action selector="addButton:" destination="BYZ-38-t0r" id="gHf-A7-PUM"/>
-                            </connections>
-                        </barButtonItem>
+                        <rightBarButtonItems>
+                            <barButtonItem systemItem="add" id="aBK-oW-lTa">
+                                <connections>
+                                    <action selector="addButton:" destination="BYZ-38-t0r" id="gHf-A7-PUM"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem title="Sort" id="iGV-fx-w26">
+                                <connections>
+                                    <action selector="organizeButton:" destination="BYZ-38-t0r" id="meZ-In-NDW"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
                     </navigationItem>
                     <connections>
                         <outlet property="searchBar" destination="CSG-tw-xq2" id="bah-pD-h97"/>

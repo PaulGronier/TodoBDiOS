@@ -15,6 +15,7 @@ class ListViewController: UIViewController {
     
     var categoryPassed = String()
     let dataManager = DataManager.shared
+//    var filteredItems = [Item]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,6 +36,7 @@ class ListViewController: UIViewController {
         
         let okAction = UIAlertAction(title: "Ok", style: .default) { (action) in
             let textField = alertController.textFields![0]
+            self.dataManager.loadData()
             if textField.text != "" {
                 let item = Item(context: DataManager.shared.persistentContainer.viewContext)
                 item.name = textField.text!
@@ -48,7 +50,8 @@ class ListViewController: UIViewController {
                 //destinationViewController?.prepare(for: UIStoryboardSegue, sender: item)
                 
                 self.navigationController?.pushViewController(destinationViewController, animated: true)
-                
+                self.dataManager.fetchedRequest.predicate = nil
+
                 
             }
         }
@@ -63,18 +66,11 @@ class ListViewController: UIViewController {
         print(categoryPassed)
     }
     
-    
-    /*
-    override func prepare(for segue: UIStoryboardSegue!, sender: Any?) {
-        if segue.identifier == "segueCategorie" {
-            let nextScene =  segue.destination as! SecondViewController
-            
-            // Pass the selected object to the new view controller.
-            nextScene.itemToSend = sender as! Item
-        }
+    @IBAction func organizeButton(_ sender: Any) {
+        dataManager.triage()
+        dataManager.loadData()
+        tableView.reloadData()
     }
- */
-    
 }
 
 
@@ -86,14 +82,7 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "ListViewCellIdentifier", for: indexPath)
         
-        var item = self.dataManager.cachedItems[indexPath.row % self.dataManager.cachedItems.count]
-
-        if isFiltering() {
-            item = self.dataManager.filteredItems[indexPath.row]
-        } else {
-            item = self.dataManager.cachedItems[indexPath.row]
-        }
-        
+        let item = self.dataManager.cachedItems[indexPath.row]
       
         cell.textLabel?.text = item.name
         cell.accessoryType = item.checked == true ? .checkmark : .none
@@ -113,9 +102,7 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if isFiltering() {
-            return self.dataManager.filteredItems.count
-        }
+
         return self.dataManager.cachedItems.count
     }
     
@@ -124,9 +111,9 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
         
         let cell = tableView.cellForRow(at: indexPath)
         
-        cell?.accessoryType = (cell?.accessoryType == .checkmark) ? .none : .checkmark
+        cell!.accessoryType = (cell!.accessoryType == .checkmark) ? .none : .checkmark
         
-        let item = self.dataManager.cachedItems[indexPath.row % self.dataManager.cachedItems.count]
+        let item = self.dataManager.cachedItems[indexPath.row]
         item.checked = !item.checked
         
         tableView.reloadRows(at: [indexPath], with: .automatic)
@@ -135,21 +122,19 @@ extension ListViewController: UITableViewDataSource, UITableViewDelegate {
     
      func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            if isFiltering() {
-                let index = self.dataManager.cachedItems.index(where: { $0 === self.dataManager.filteredItems[indexPath.row] } )
-                self.dataManager.filteredItems.remove(at: index!)
-                self.dataManager.removeItem(at: index!)
-            } else {
-                self.dataManager.removeItem(at: indexPath.row)
-            }
+
+            let item = self.dataManager.cachedItems[indexPath.row]
+            self.dataManager.removeItem(item)
             tableView.deleteRows(at: [indexPath], with: .automatic)
         }
     }
     
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        let sourceItem = self.dataManager.cachedItems[sourceIndexPath.row % self.dataManager.cachedItems.count]
-         self.dataManager.removeItem(at: sourceIndexPath.row)
+        //let sourceItem = self.dataManager.cachedItems[sourceIndexPath.row % self.dataManager.cachedItems.count]
+        let sourceItem = self.dataManager.cachedItems.remove(at: sourceIndexPath.row)
+        //self.dataManager.removeItem(sourceItem)
         self.dataManager.insertItem(item: sourceItem, at: destinationIndexPath.row)
+        self.dataManager.saveData()
     }
     
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
@@ -174,20 +159,19 @@ extension ListViewController: UISearchBarDelegate  {
         return searchBar.text?.isEmpty ?? true
     }
     
-    func filterContentForSearchText(_ searchText: String, scope: String = "All") {
-        self.dataManager.filteredItems = self.dataManager.cachedItems.filter({( item : Item) -> Bool in
-            return item.name!.lowercased().contains(searchText.lowercased())
-        })
-        
-        tableView.reloadData()
-    }
-    
     func isFiltering() -> Bool {
         return !searchBarIsEmpty()
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        filterContentForSearchText(searchText)
+      
+        if !searchBarIsEmpty() {
+            dataManager.fetchedRequest.predicate = NSPredicate(format: "name contains[cd] %@", searchText)
+        } else {
+            dataManager.fetchedRequest.predicate = nil
+        }
+        dataManager.loadData()
+        tableView.reloadData()
     }
     
 }
